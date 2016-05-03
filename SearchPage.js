@@ -86,7 +86,8 @@ class SearchPage extends Component {
     super(props);
     this.state = {
       searchString: 'london',
-      isLoading: false
+      isLoading: false,
+      message: ''
     };
   }
 
@@ -94,14 +95,32 @@ class SearchPage extends Component {
     this.setState({ searchString: event.nativeEvent.text });
   }
 
-  _executeQuery(query) {
-    console.log(query);
-    this.setState({ isLoading: true });
-  }
-
   onSearchPressed() {
     var query = urlForQueryAndPage('place_name', this.state.searchString, 1);
     this._executeQuery(query);
+  }
+
+  _executeQuery(query) {
+    console.log(query);
+    this.setState({ isLoading: true });
+
+    fetch(query)
+      .then(response => response.json())
+      .then(json => this._handleResponse(json.response))
+      .catch(error =>
+        this.setState({
+          isLoading: false,
+          message: 'Something bad happened ' + error
+        }));
+  }
+
+  _handleResponse(response) {
+    this.setState({ isLoading: false, message: '' });
+    if (response.application_response_code.substr(0, 1) === '1') {
+      console.log('Properties found: ' + response.listings.length);
+    } else {
+      this.setState({ message: 'Location not recognized; please try again.'});
+    }
   }
 
   render() {
@@ -136,6 +155,7 @@ class SearchPage extends Component {
         </TouchableHighlight>
         <Image source={require('./Resources/house.png')} style={styles.image}/>
         {spinner}
+        <Text style={styles.description}>{this.state.message}</Text>
       </View>
     );
   }
