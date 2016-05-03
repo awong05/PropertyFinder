@@ -57,7 +57,7 @@ class PropertyView extends Component {
         <Image style={styles.image}
             source={{uri: property.img_url}} />
         <View style={styles.heading}>
-          <Text style={styles.price}>£{price}</Text>
+          <Text style={styles.price}>{price}</Text>
           <Text style={styles.title}>{property.title}</Text>
           <View style={styles.separator}/>
         </View>
